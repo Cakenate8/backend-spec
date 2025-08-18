@@ -10,11 +10,15 @@ class InventorySchema(SQLAlchemyAutoSchema):
 
 inventory_schema = InventorySchema()
 inventories_schema = InventorySchema(many=True)
-inventory_bp = Blueprint("inventory_bp", __name__)
+inventory_bp = Blueprint("inventory", __name__)
 
 @inventory_bp.route("/", methods=["POST"])
 def create_part():
     data = request.get_json()
+    # ✅ Validate that required fields are present and not empty
+    if not data or not data.get("part") or not data.get("price"):
+        return jsonify({"error": "Part and price are required"}), 400
+
     part = inventory_schema.load(data, session=db.session)
     db.session.add(part)
     db.session.commit()
@@ -28,7 +32,7 @@ def get_parts():
 @inventory_bp.route("/<int:part_id>", methods=["PUT"])
 def update_part(part_id):
     part = Inventory.query.get_or_404(part_id)
-    data = request.get_json()
+    data = request.get_json() or {}
     part.part = data.get("part", part.part)
     part.price = data.get("price", part.price)
     db.session.commit()

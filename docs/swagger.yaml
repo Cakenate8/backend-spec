@@ -1,0 +1,426 @@
+paths:
+  /mechanic/:
+    post:
+      tags:
+        - Mechanics
+      summary: Create a new mechanic
+      description: Add a mechanic with name and skill level to the system.
+      parameters:
+        - in: body
+          name: mechanic
+          required: true
+          schema:
+            $ref: '#/definitions/MechanicPayload'
+      responses:
+        201:
+          description: Mechanic created successfully
+          schema:
+            $ref: '#/definitions/MechanicResponse'
+        400:
+          description: Invalid request body
+
+    get:
+      tags:
+        - Mechanics
+      summary: Get all mechanics
+      description: Retrieve a list of all mechanics.
+      responses:
+        200:
+          description: A list of mechanics
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/MechanicResponse'
+
+  /mechanic/{id}:
+    put:
+      tags:
+        - Mechanics
+      summary: Update a mechanic
+      description: Update the details of an existing mechanic.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+        - in: body
+          name: mechanic
+          required: true
+          schema:
+            $ref: '#/definitions/MechanicPayload'
+      responses:
+        200:
+          description: Mechanic updated successfully
+          schema:
+            $ref: '#/definitions/MechanicResponse'
+        404:
+          description: Mechanic not found
+
+    delete:
+      tags:
+        - Mechanics
+      summary: Delete a mechanic
+      description: Remove a mechanic from the system.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Mechanic deleted successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Mechanic deleted"
+        404:
+          description: Mechanic not found
+
+  /mechanic/limited:
+    get:
+      tags:
+        - Mechanics
+      summary: Rate limited and cached route
+      description: Demonstrates rate limiting (5 requests/min) and caching (60 seconds).
+      responses:
+        200:
+          description: Success message
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "This route is rate limited and cached"
+
+  /mechanic/most-tickets:
+    get:
+      tags:
+        - Mechanics
+      summary: Get mechanics by ticket count
+      description: Retrieve mechanics ordered by the number of service tickets they are assigned to.
+      responses:
+        200:
+          description: List of mechanics with their ticket counts
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  example: 1
+                name:
+                  type: string
+                  example: "Jane Doe"
+                ticket_count:
+                  type: integer
+                  example: 5
+
+
+paths:
+  /service-ticket/:
+    post:
+      tags:
+        - Service Tickets
+      summary: Create a new service ticket
+      description: Add a new service ticket with description and status.
+      parameters:
+        - in: body
+          name: ticket
+          required: true
+          schema:
+            $ref: '#/definitions/ServiceTicketPayload'
+      responses:
+        201:
+          description: Service ticket created successfully
+          schema:
+            $ref: '#/definitions/ServiceTicketResponse'
+        400:
+          description: Invalid request body
+
+    get:
+      tags:
+        - Service Tickets
+      summary: Get all service tickets
+      description: Retrieve all service tickets in the system.
+      responses:
+        200:
+          description: A list of service tickets
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ServiceTicketResponse'
+
+  /service-ticket/{ticket_id}/assign-mechanic/{mechanic_id}:
+    put:
+      tags:
+        - Service Tickets
+      summary: Assign a mechanic to a ticket
+      description: Add a mechanic to the specified service ticket.
+      parameters:
+        - in: path
+          name: ticket_id
+          required: true
+          type: integer
+        - in: path
+          name: mechanic_id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Mechanic assigned to ticket
+          schema:
+            $ref: '#/definitions/ServiceTicketResponse'
+        404:
+          description: Ticket or mechanic not found
+
+  /service-ticket/{ticket_id}/remove-mechanic/{mechanic_id}:
+    put:
+      tags:
+        - Service Tickets
+      summary: Remove a mechanic from a ticket
+      description: Remove a mechanic from the specified service ticket.
+      parameters:
+        - in: path
+          name: ticket_id
+          required: true
+          type: integer
+        - in: path
+          name: mechanic_id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Mechanic removed from ticket
+          schema:
+            $ref: '#/definitions/ServiceTicketResponse'
+        404:
+          description: Ticket or mechanic not found
+
+  /service-ticket/limited:
+    get:
+      tags:
+        - Service Tickets
+      summary: Rate limited and cached route
+      description: Demonstrates rate limiting (5 requests/min) and caching (60 seconds) for service tickets.
+      responses:
+        200:
+          description: Success message
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "This service ticket route is rate limited and cached"
+
+  /service-ticket/{ticket_id}/edit:
+    put:
+      tags:
+        - Service Tickets
+      summary: Edit mechanics assigned to a ticket
+      description: Add or remove mechanics from a service ticket (token required).
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: ticket_id
+          required: true
+          type: integer
+        - in: body
+          name: mechanics
+          required: true
+          schema:
+            type: object
+            properties:
+              add_ids:
+                type: array
+                items:
+                  type: integer
+                example: [1, 2]
+              remove_ids:
+                type: array
+                items:
+                  type: integer
+                example: [3]
+      responses:
+        200:
+          description: Updated service ticket
+          schema:
+            $ref: '#/definitions/ServiceTicketResponse'
+        404:
+          description: Ticket or mechanic not found
+
+  /service-ticket/{ticket_id}/add-part/{part_id}:
+    post:
+      tags:
+        - Service Tickets
+      summary: Add part to a service ticket
+      description: Attach an inventory part to the specified service ticket (token required).
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: ticket_id
+          required: true
+          type: integer
+        - in: path
+          name: part_id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Part added to ticket
+          schema:
+            $ref: '#/definitions/ServiceTicketResponse'
+        404:
+          description: Ticket or part not found
+
+
+paths:
+  /inventory/:
+    post:
+      tags:
+        - Inventory
+      summary: Create a new part
+      description: Add a new inventory part with a name and price.
+      parameters:
+        - in: body
+          name: part
+          required: true
+          schema:
+            $ref: '#/definitions/InventoryPayload'
+      responses:
+        201:
+          description: Part created successfully
+          schema:
+            $ref: '#/definitions/InventoryResponse'
+        400:
+          description: Invalid request body
+
+    get:
+      tags:
+        - Inventory
+      summary: Get all parts
+      description: Retrieve a list of all inventory parts.
+      responses:
+        200:
+          description: A list of parts
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/InventoryResponse'
+
+  /inventory/{part_id}:
+    put:
+      tags:
+        - Inventory
+      summary: Update a part
+      description: Update the name and/or price of an existing part.
+      parameters:
+        - in: path
+          name: part_id
+          required: true
+          type: integer
+        - in: body
+          name: part
+          required: true
+          schema:
+            $ref: '#/definitions/InventoryPayload'
+      responses:
+        200:
+          description: Part updated successfully
+          schema:
+            $ref: '#/definitions/InventoryResponse'
+        404:
+          description: Part not found
+
+    delete:
+      tags:
+        - Inventory
+      summary: Delete a part
+      description: Remove a part from inventory.
+      parameters:
+        - in: path
+          name: part_id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Part deleted successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Deleted"
+        404:
+          description: Part not found
+
+
+paths:
+  /customer/login:
+    post:
+      tags:
+        - Customers
+      summary: Customer login
+      description: Authenticate a customer and return a JWT token.
+      parameters:
+        - in: body
+          name: credentials
+          required: true
+          schema:
+            $ref: '#/definitions/CustomerLoginPayload'
+      responses:
+        200:
+          description: Login successful, returns a JWT token
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        400:
+          description: Validation errors in request body
+        401:
+          description: Invalid credentials
+
+  /customer/:
+    get:
+      tags:
+        - Customers
+      summary: Get paginated customers
+      description: Retrieve a paginated list of all customers.
+      parameters:
+        - in: query
+          name: page
+          required: false
+          type: integer
+          description: Page number (default 1)
+          example: 1
+        - in: query
+          name: per_page
+          required: false
+          type: integer
+          description: Items per page (default 10)
+          example: 10
+      responses:
+        200:
+          description: Paginated list of customers
+          schema:
+            type: object
+            properties:
+              total:
+                type: integer
+                example: 50
+              pages:
+                type: integer
+                example: 5
+              current_page:
+                type: integer
+                example: 1
+              customers:
+                type: array
+                items:
+                  $ref: '#/definitions/CustomerResponse'

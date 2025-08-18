@@ -4,18 +4,29 @@ from models import Customer
 from werkzeug.security import check_password_hash
 from utils import encode_token
 
-class CustomerSchema(Schema):
+# --- Schemas ---
+class CustomerLoginSchema(Schema):
     email = fields.Email(required=True)
     password = fields.String(required=True)
 
-login_schema = CustomerSchema()
-customer_bp = Blueprint('customer_bp', __name__)
-customers_schema = CustomerSchema(many=True)
+class CustomerPublicSchema(Schema):
+    id = fields.Int()
+    email = fields.Email()
 
+login_schema = CustomerLoginSchema()
+customers_schema = CustomerPublicSchema(many=True)
 
+# --- Blueprint with prefix ---
+customer_bp = Blueprint('customer', __name__, url_prefix="/customer")  # ✅ match tests URLs
+
+# --- Routes ---
 @customer_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
+    # ✅ validate payload
+    if not data or "email" not in data or "password" not in data:
+        return jsonify({"error": "Email and password required"}), 400
+
     errors = login_schema.validate(data)
     if errors:
         return jsonify(errors), 400
@@ -31,10 +42,10 @@ def login():
 def get_customers():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
-    customers = Customer.query.paginate(page=page, per_page=per_page, error_out=False)
+    pagination = Customer.query.paginate(page=page, per_page=per_page, error_out=False)
     return jsonify({
-        "total": customers.total,
-        "pages": customers.pages,
-        "current_page": customers.page,
-        "customers": customers_schema.dump(customers.items)
+        "total": pagination.total,
+        "pages": pagination.pages,
+        "current_page": pagination.page,
+        "customers": customers_schema.dump(pagination.items)
     }), 200
