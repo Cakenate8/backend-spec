@@ -13,7 +13,7 @@ class InventoryRoutesTest(unittest.TestCase):
         with self.app.app_context():
             db.drop_all()
     
-    # POST /inventory/ - create part
+
     def test_create_part_valid(self):
         data = {"part": "Brake Pad", "price": "49.99"}
         with self.app.app_context():
@@ -25,22 +25,22 @@ class InventoryRoutesTest(unittest.TestCase):
         data = {"part": "", "price": ""}
         with self.app.app_context():
             response = self.client.post("/inventory/", json=data)
-        self.assertEqual(response.status_code, 400)  # Marshmallow validation error
+        self.assertEqual(response.status_code, 400) 
 
-    # GET /inventory/ - get all parts
+    
     def test_get_parts(self):
         with self.app.app_context():
             response = self.client.get("/inventory/")
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.get_json(), list)
 
-    # PUT /inventory/<part_id> - update part
+
     def test_update_part_valid(self):
         with self.app.app_context():
             part = Inventory(part="Oil Filter", price="15.00")
             db.session.add(part)
             db.session.commit()
-            part_id = part.id  # capture ID
+            part_id = part.id
 
             data = {"part": "Oil Filter Updated", "price": "18.00"}
             response = self.client.put(f"/inventory/{part_id}", json=data)
@@ -52,7 +52,6 @@ class InventoryRoutesTest(unittest.TestCase):
             response = self.client.put("/inventory/999", json={"part": "None", "price": "0"})
         self.assertEqual(response.status_code, 404)
 
-    # DELETE /inventory/<part_id> - delete part
     def test_delete_part_valid(self):
         with self.app.app_context():
             part = Inventory(part="Tire", price="100.00")

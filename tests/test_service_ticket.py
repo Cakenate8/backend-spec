@@ -9,14 +9,12 @@ class ServiceTicketRoutesTest(unittest.TestCase):
         self.client = self.app.test_client()
         with self.app.app_context():
             db.create_all()
-            # create a mechanic, inventory, and customer for tests
             self.mechanic = Mechanic(name="John", skill_level="Expert")
             self.part = Inventory(part="Brake Pad", price="49.99")
             self.customer = Customer(email="test@example.com")
             self.customer.set_password("Password123")
             db.session.add_all([self.mechanic, self.part, self.customer])
             db.session.commit()
-            # capture IDs immediately
             self.mechanic_id = self.mechanic.id
             self.part_id = self.part.id
             self.customer_id = self.customer.id
@@ -26,7 +24,7 @@ class ServiceTicketRoutesTest(unittest.TestCase):
         with self.app.app_context():
             db.drop_all()
 
-    # POST /service_ticket/ - create ticket
+
     def test_create_ticket_valid(self):
         data = {"description": "Fix brakes", "status": "Open"}
         with self.app.app_context():
@@ -40,14 +38,14 @@ class ServiceTicketRoutesTest(unittest.TestCase):
             response = self.client.post("/service_ticket/", json=data)
         self.assertEqual(response.status_code, 400)  # assuming schema validation returns 400
 
-    # GET /service_ticket/ - get all tickets
+
     def test_get_tickets(self):
         with self.app.app_context():
             response = self.client.get("/service_ticket/")
         self.assertEqual(response.status_code, 200)
         self.assertIsInstance(response.get_json(), list)
 
-    # PUT assign mechanic
+
     def test_assign_mechanic(self):
         with self.app.app_context():
             ticket = ServiceTicket(description="Test", status="Open")
@@ -60,7 +58,7 @@ class ServiceTicketRoutesTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("John", response.get_data(as_text=True))
 
-    # PUT remove mechanic
+
     def test_remove_mechanic(self):
         with self.app.app_context():
             ticket = ServiceTicket(description="Test", status="Open", mechanics=[self.mechanic])
@@ -73,7 +71,7 @@ class ServiceTicketRoutesTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotIn("John", response.get_data(as_text=True))
 
-    # PUT /<ticket_id>/edit - token required
+
     def test_edit_mechanics_with_token(self):
         with self.app.app_context():
             ticket = ServiceTicket(description="EditTest", status="Open")
@@ -89,7 +87,7 @@ class ServiceTicketRoutesTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("John", response.get_data(as_text=True))
 
-    # POST add-part/<part_id> - token required
+    
     def test_add_part_to_ticket_with_token(self):
         with self.app.app_context():
             ticket = ServiceTicket(description="PartTest", status="Open")
@@ -104,7 +102,7 @@ class ServiceTicketRoutesTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("Brake Pad", response.get_data(as_text=True))
 
-    # GET /service_ticket/limited - rate limited
+    
     def test_limited_and_cached_ticket(self):
         with self.app.app_context():
             response = self.client.get("/service_ticket/limited")

@@ -15,7 +15,6 @@ inventory_bp = Blueprint("inventory", __name__)
 @inventory_bp.route("/", methods=["POST"])
 def create_part():
     data = request.get_json()
-    # ✅ Validate that required fields are present and not empty
     if not data or not data.get("part") or not data.get("price"):
         return jsonify({"error": "Part and price are required"}), 400
 

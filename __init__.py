@@ -14,7 +14,7 @@ def create_app(config_name="default"):
     app = Flask(__name__)
     app.secret_key = SECRET_KEY  
 
-    # Database configuration
+
     if config_name == "testing":
         app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"  # in-memory DB for tests
         app.config["TESTING"] = True
@@ -23,20 +23,19 @@ def create_app(config_name="default"):
             "mysql+mysqlconnector://root:Sabres26.@localhost/Backend_Spec"
         )
 
-    # Cache configuration
+
     app.config["CACHE_TYPE"] = "SimpleCache"
     app.config["CACHE_DEFAULT_TIMEOUT"] = 300
 
-    # Initialize extensions
+
     db.init_app(app)
     limiter.init_app(app)
     cache.init_app(app)
 
-    # Create all tables in testing mode
+
     with app.app_context():
         db.create_all()
 
-    # Swagger setup
     SWAGGER_URL = "/swagger"
     API_URL = "/swagger.json"
     swaggerui_blueprint = get_swaggerui_blueprint(
@@ -60,13 +59,13 @@ def create_app(config_name="default"):
             "paths": {}
         })
 
-    # Register blueprints with URL prefixes that match tests
+
     app.register_blueprint(customer_bp, url_prefix="/customer")
     app.register_blueprint(mechanic_bp, url_prefix="/mechanic")
     app.register_blueprint(service_ticket_bp, url_prefix="/service_ticket")
     app.register_blueprint(inventory_bp, url_prefix="/inventory")
 
-    # JSON error handlers
+
     @app.errorhandler(404)
     def not_found_error(e):
         return jsonify({"error": "Resource not found"}), 404

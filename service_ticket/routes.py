@@ -3,7 +3,7 @@ from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from marshmallow import fields
 from models import db, ServiceTicket, Mechanic, Inventory
 from utils import token_required
-from extensions import limiter, cache   # <-- keep only this
+from extensions import limiter, cache   
 
 
 class MechanicSchema(SQLAlchemyAutoSchema):
@@ -33,7 +33,6 @@ service_ticket_bp = Blueprint('service_ticket', __name__)
 @service_ticket_bp.route('/', methods=['POST'])
 def create_ticket():
     data = request.get_json()
-    # ✅ Validate required fields and non-empty values
     if not data or not data.get("description") or not data.get("status"):
         return jsonify({"error": "Description and status are required"}), 400
 

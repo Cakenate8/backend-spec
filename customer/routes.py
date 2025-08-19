@@ -4,7 +4,7 @@ from models import Customer
 from werkzeug.security import check_password_hash
 from utils import encode_token
 
-# --- Schemas ---
+
 class CustomerLoginSchema(Schema):
     email = fields.Email(required=True)
     password = fields.String(required=True)
@@ -16,14 +16,13 @@ class CustomerPublicSchema(Schema):
 login_schema = CustomerLoginSchema()
 customers_schema = CustomerPublicSchema(many=True)
 
-# --- Blueprint with prefix ---
-customer_bp = Blueprint('customer', __name__, url_prefix="/customer")  # ✅ match tests URLs
 
-# --- Routes ---
+customer_bp = Blueprint('customer', __name__, url_prefix="/customer")
+
+
 @customer_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
-    # ✅ validate payload
     if not data or "email" not in data or "password" not in data:
         return jsonify({"error": "Email and password required"}), 400
 

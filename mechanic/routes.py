@@ -21,7 +21,6 @@ mechanic_bp = Blueprint('mechanic', __name__)
 @mechanic_bp.route('/', methods=['POST'])
 def create_mechanic():
     data = request.get_json()
-    # Validate required fields and non-empty values
     if not data or not data.get("name") or not data.get("skill_level"):
         return jsonify({"error": "Name and skill_level are required"}), 400
 
