@@ -1,3 +1,9 @@
+swagger: "2.0"
+info:
+  title: Auto Shop API
+  version: "1.0.0"
+
+
 paths:
   /mechanic/:
     post:
@@ -19,6 +25,7 @@ paths:
         400:
           description: Invalid request body
 
+
     get:
       tags:
         - Mechanics
@@ -31,6 +38,7 @@ paths:
             type: array
             items:
               $ref: '#/definitions/MechanicResponse'
+
 
   /mechanic/{id}:
     put:
@@ -56,6 +64,7 @@ paths:
         404:
           description: Mechanic not found
 
+
     delete:
       tags:
         - Mechanics
@@ -78,6 +87,7 @@ paths:
         404:
           description: Mechanic not found
 
+
   /mechanic/limited:
     get:
       tags:
@@ -93,6 +103,7 @@ paths:
               message:
                 type: string
                 example: "This route is rate limited and cached"
+
 
   /mechanic/most-tickets:
     get:
@@ -119,7 +130,6 @@ paths:
                   example: 5
 
 
-paths:
   /service-ticket/:
     post:
       tags:
@@ -140,6 +150,7 @@ paths:
         400:
           description: Invalid request body
 
+
     get:
       tags:
         - Service Tickets
@@ -152,6 +163,7 @@ paths:
             type: array
             items:
               $ref: '#/definitions/ServiceTicketResponse'
+
 
   /service-ticket/{ticket_id}/assign-mechanic/{mechanic_id}:
     put:
@@ -176,6 +188,7 @@ paths:
         404:
           description: Ticket or mechanic not found
 
+
   /service-ticket/{ticket_id}/remove-mechanic/{mechanic_id}:
     put:
       tags:
@@ -199,6 +212,7 @@ paths:
         404:
           description: Ticket or mechanic not found
 
+
   /service-ticket/limited:
     get:
       tags:
@@ -214,6 +228,7 @@ paths:
               message:
                 type: string
                 example: "This service ticket route is rate limited and cached"
+
 
   /service-ticket/{ticket_id}/edit:
     put:
@@ -252,6 +267,7 @@ paths:
         404:
           description: Ticket or mechanic not found
 
+
   /service-ticket/{ticket_id}/add-part/{part_id}:
     post:
       tags:
@@ -278,7 +294,6 @@ paths:
           description: Ticket or part not found
 
 
-paths:
   /inventory/:
     post:
       tags:
@@ -299,6 +314,7 @@ paths:
         400:
           description: Invalid request body
 
+
     get:
       tags:
         - Inventory
@@ -311,6 +327,7 @@ paths:
             type: array
             items:
               $ref: '#/definitions/InventoryResponse'
+
 
   /inventory/{part_id}:
     put:
@@ -336,6 +353,7 @@ paths:
         404:
           description: Part not found
 
+
     delete:
       tags:
         - Inventory
@@ -359,7 +377,6 @@ paths:
           description: Part not found
 
 
-paths:
   /customer/login:
     post:
       tags:
@@ -385,6 +402,7 @@ paths:
           description: Validation errors in request body
         401:
           description: Invalid credentials
+
 
   /customer/:
     get:
@@ -424,3 +442,78 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/CustomerResponse'
+
+You said:
+definitions:
+  MechanicPayload:
+    type: object
+    required:
+      - name
+      - skill_level
+    properties:
+      name:
+        type: string
+      skill_level:
+        type: string
+
+  MechanicResponse:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      skill_level:
+        type: string
+
+  ServiceTicketPayload:
+    type: object
+    properties:
+      description:
+        type: string
+      status:
+        type: string
+
+  ServiceTicketResponse:
+    type: object
+    properties:
+      id:
+        type: integer
+      description:
+        type: string
+      status:
+        type: string
+
+  InventoryPayload:
+    type: object
+    properties:
+      name:
+        type: string
+      price:
+        type: number
+
+  InventoryResponse:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+
+  CustomerLoginPayload:
+    type: object
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+
+  CustomerResponse:
+    type: object
+    properties:
+      id:
+        type: integer
+      email:
+        type: string
