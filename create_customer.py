@@ -1,6 +1,6 @@
 from werkzeug.security import generate_password_hash
 from  __init__ import create_app
-from models import Customer,db
+from models import Customer, db
 
 app = create_app()
 

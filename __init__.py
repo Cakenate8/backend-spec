@@ -1,7 +1,5 @@
 from flask import Flask, jsonify
 from models import db
-from flask_limiter.util import get_remote_address
-from utils import SECRET_KEY
 from flask_swagger_ui import get_swaggerui_blueprint
 from mechanic.routes import mechanic_bp
 from customer.routes import customer_bp
@@ -10,32 +8,21 @@ from service_ticket.routes import service_ticket_bp
 from extensions import limiter, cache
 
 
-def create_app(config_name="default"):
+def create_app(config_class):
     app = Flask(__name__)
-    app.secret_key = SECRET_KEY  
+    app.config.from_object(config_class)
 
-
-    if config_name == "testing":
-        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"  # in-memory DB for tests
-        app.config["TESTING"] = True
-    else:
-        app.config["SQLALCHEMY_DATABASE_URI"] = (
-            "mysql+mysqlconnector://root:Sabres26.@localhost/Backend_Spec"
-        )
-
-
-    app.config["CACHE_TYPE"] = "SimpleCache"
-    app.config["CACHE_DEFAULT_TIMEOUT"] = 300
-
-
+    # Init extensions
     db.init_app(app)
     limiter.init_app(app)
     cache.init_app(app)
 
+    
+    if app.config.get("TESTING") or app.config.get("DEBUG"):
+        with app.app_context():
+            db.create_all()
 
-    with app.app_context():
-        db.create_all()
-
+    # Swagger
     SWAGGER_URL = "/swagger"
     API_URL = "/swagger.json"
     swaggerui_blueprint = get_swaggerui_blueprint(
@@ -55,11 +42,11 @@ def create_app(config_name="default"):
                 "description": "API documentation for Backend_Spec project"
             },
             "basePath": "/",
-            "schemes": ["http"],
+            "schemes": ["https"],  
             "paths": {}
         })
 
-
+    
     app.register_blueprint(customer_bp, url_prefix="/customer")
     app.register_blueprint(mechanic_bp, url_prefix="/mechanic")
     app.register_blueprint(service_ticket_bp, url_prefix="/service_ticket")
