@@ -1,6 +1,5 @@
 import os
 
-
 class Config:
     """Base configuration shared across environments."""
     SECRET_KEY = os.getenv("SECRET_KEY", "dev_secret_key")
@@ -25,8 +24,5 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     """Production on Render using MySQL."""
-    SQLALCHEMY_DATABASE_URI = (
-        f"mysql+mysqlconnector://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
-        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
-    )
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     DEBUG = False
