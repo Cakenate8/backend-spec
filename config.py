@@ -24,6 +24,9 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
-    """Production on Render using PostgreSQL."""
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
+    """Production on Render using MySQL."""
+    SQLALCHEMY_DATABASE_URI = (
+        f"mysql+mysqlconnector://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
+        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+    )
     DEBUG = False
