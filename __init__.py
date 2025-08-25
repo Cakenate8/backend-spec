@@ -6,13 +6,14 @@ from customer.routes import customer_bp
 from inventory.routes import inventory_bp
 from service_ticket.routes import service_ticket_bp
 from extensions import limiter, cache
+import os
 
 
 def create_app(config_class):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # Init extensions
+    
     db.init_app(app)
     limiter.init_app(app)
     cache.init_app(app)
@@ -22,7 +23,7 @@ def create_app(config_class):
         with app.app_context():
             db.create_all()
 
-    # Swagger
+    
     SWAGGER_URL = "/swagger"
     API_URL = "/swagger.json"
     swaggerui_blueprint = get_swaggerui_blueprint(
@@ -52,7 +53,7 @@ def create_app(config_class):
     app.register_blueprint(service_ticket_bp, url_prefix="/service_ticket")
     app.register_blueprint(inventory_bp, url_prefix="/inventory")
 
-
+    
     @app.errorhandler(404)
     def not_found_error(e):
         return jsonify({"error": "Resource not found"}), 404
