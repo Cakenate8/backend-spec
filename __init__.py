@@ -8,20 +8,19 @@ from service_ticket.routes import service_ticket_bp
 from extensions import limiter, cache
 import os
 
-
 def create_app(config_class):
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    # --- Set SQLALCHEMY_DATABASE_URI from environment variable (Render) ---
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 
     # --- Initialize extensions ---
     db.init_app(app)
     limiter.init_app(app)
     cache.init_app(app)
-
-    # --- Set SQLALCHEMY_DATABASE_URI from environment variable for Render ---
-    database_url = os.getenv("DATABASE_URL")
-    if database_url:
-        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 
     # --- Only create tables in testing or debug mode ---
     if app.config.get("TESTING") or app.config.get("DEBUG"):
