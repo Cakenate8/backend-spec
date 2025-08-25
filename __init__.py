@@ -13,17 +13,22 @@ def create_app(config_class):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    
+    # --- Initialize extensions ---
     db.init_app(app)
     limiter.init_app(app)
     cache.init_app(app)
 
-    
+    # --- Set SQLALCHEMY_DATABASE_URI from environment variable for Render ---
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+
+    # --- Only create tables in testing or debug mode ---
     if app.config.get("TESTING") or app.config.get("DEBUG"):
         with app.app_context():
             db.create_all()
 
-    
+    # --- Swagger setup ---
     SWAGGER_URL = "/swagger"
     API_URL = "/swagger.json"
     swaggerui_blueprint = get_swaggerui_blueprint(
@@ -47,13 +52,13 @@ def create_app(config_class):
             "paths": {}
         })
 
-    
+    # --- Register blueprints ---
     app.register_blueprint(customer_bp, url_prefix="/customer")
     app.register_blueprint(mechanic_bp, url_prefix="/mechanic")
     app.register_blueprint(service_ticket_bp, url_prefix="/service_ticket")
     app.register_blueprint(inventory_bp, url_prefix="/inventory")
 
-    
+    # --- Error handlers ---
     @app.errorhandler(404)
     def not_found_error(e):
         return jsonify({"error": "Resource not found"}), 404
