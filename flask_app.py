@@ -1,4 +1,4 @@
-from __init__ import create_app
+from app import create_app
 from config import DevelopmentConfig, ProductionConfig, TestingConfig
 import os
 

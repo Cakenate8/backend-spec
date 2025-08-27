@@ -1,5 +1,5 @@
 import unittest
-from __init__ import create_app
+from app import create_app
 from models import Customer, db
 from werkzeug.security import generate_password_hash
 

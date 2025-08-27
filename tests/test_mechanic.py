@@ -1,5 +1,5 @@
 import unittest
-from __init__ import create_app
+from app import create_app
 from models import Mechanic, db
 
 class MechanicRoutesTest(unittest.TestCase):
