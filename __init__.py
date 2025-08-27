@@ -6,10 +6,27 @@ from customer.routes import customer_bp
 from inventory.routes import inventory_bp
 from service_ticket.routes import service_ticket_bp
 from extensions import limiter, cache
+from config import DevelopmentConfig, TestingConfig, ProductionConfig
 import os
 
-def create_app(config_class):
+# Mapping for string-based config selection
+CONFIG_MAPPING = {
+    "development": DevelopmentConfig,
+    "testing": TestingConfig,
+    "production": ProductionConfig
+}
+
+def create_app(config_class_or_name):
     app = Flask(__name__)
+
+    # Support either a class or a string name
+    if isinstance(config_class_or_name, str):
+        config_class = CONFIG_MAPPING.get(config_class_or_name.lower())
+        if not config_class:
+            raise ValueError(f"Invalid config name '{config_class_or_name}'")
+    else:
+        config_class = config_class_or_name
+
     app.config.from_object(config_class)
 
     # --- Set SQLALCHEMY_DATABASE_URI from environment variable (Render) ---
