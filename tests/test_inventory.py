@@ -1,5 +1,5 @@
 import unittest
-from app import create_app
+from __init__ import create_app
 from models import Inventory, db
 
 class InventoryRoutesTest(unittest.TestCase):

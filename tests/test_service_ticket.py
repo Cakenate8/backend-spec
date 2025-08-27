@@ -1,5 +1,5 @@
 import unittest
-from app import create_app
+from __init__ import create_app
 from models import ServiceTicket, Mechanic, Inventory, Customer, db
 from utils import encode_token  
 
